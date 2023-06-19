@@ -1,11 +1,10 @@
 [tool.poetry]
-name = "stream-of-consciousness"
+name = "streams-of-consciousness"
 version = "0.1.0"
 description = "Tool for musicians to track pay-per-stream (PPS) rates for various streaming platforms over time"
 authors = ["Jon Stelman <jon@jonstelman.com>"]
 license = "GNU AFFERO GENERAL PUBLIC LICENSE"
 readme = "README.md"
-packages = [{include = "stream_of_consciousness"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.9.7 || >3.9.7,<3.11"
