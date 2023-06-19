@@ -1,3 +1,7 @@
+data/earnings_data/*
+app/distributor_report_analysis.html
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
