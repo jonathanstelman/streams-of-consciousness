@@ -1,6 +1,7 @@
 from pathlib import Path
 import streamlit as st
-from logic import load_earnings_report, generate_reports
+from data_loader import load_earnings_report
+from data_processor import generate_reports
 from plotting import generate_bokeh_plot
 
 

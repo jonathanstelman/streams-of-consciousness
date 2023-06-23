@@ -45,7 +45,7 @@ We are looking for musicians who would like to be among the first to try the Str
 `poetry shell`
 
 ### Launch Streamlit web app
-`streamlit run app/app.py`
+`streamlit run src/streamlit_app.py`
 
 ### Command line usage
 Run with the following arguments:
@@ -62,5 +62,5 @@ Run with the following arguments:
   
 Example:
 ```
-python distributor_report_analysis.py /path/to/export/file.txt cd_baby stream
+python src/main.py /path/to/export/file.txt cd_baby stream
 ```
