@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 import logging
 
-from cpi import inflate
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -45,6 +44,8 @@ def adjust_report_for_inflation(report: pd.DataFrame, target_year: int):
 
 def generate_reports(data, transactions=['stream'], adjust_for_inflation=True):
     """Aggregate all-time data by counts, earnings, and rates
+
+    TODO: separate reports into different functions
     """
     if transactions:
         tr = [t.lower() for t in transactions]
@@ -63,7 +64,7 @@ def generate_reports(data, transactions=['stream'], adjust_for_inflation=True):
 
 
 def convert_rate(raw_currency_amt: float, raw_currency_year: int, convert_year: int):
-
+    from cpi import inflate
     if not raw_currency_amt:
         return np.nan
     conv_currency_amt = None

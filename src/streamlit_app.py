@@ -5,7 +5,7 @@ from data_processor import generate_reports
 from plotting import generate_bokeh_plot
 
 
-@st.cache_data
+#@st.cache_data
 def load_earnings_data(data_file_path, distributor):
     partner_map_file = Path('data/streaming_services/partner_map_simplified.csv')
     data = load_earnings_report(data_file_path, distributor, partner_map_file)
@@ -22,14 +22,11 @@ st.write("""
     """
 )
 
-
 uploaded_file = st.file_uploader(
     label='**Step 1:** Upload your payout data file.',
     accept_multiple_files=False,
     type=['.csv', '.txt', 'xlsx']
 )
-
-
 
 distributor = st.selectbox(
     label='**Step 2:** Select your distributor.', 
@@ -42,7 +39,7 @@ transactions = st.multiselect(
     default=['Stream'])
 
 adjust_for_inflation = st.checkbox(
-    label='**Step 3:** Should we adjust for inflation?', 
+    label='**Step 3:** Adjust for inflation? (Adds about 1 minute)', 
     value=True
 )
 
@@ -71,7 +68,11 @@ def run_report():
     earnings_data = load_earnings_data(uploaded_file, distributor_code)
 
     # Generate summary report
-    summary_reports = generate_reports(earnings_data, transaction_codes, adjust_for_inflation=True)
+    summary_reports = generate_reports(
+        earnings_data, 
+        transaction_codes, 
+        adjust_for_inflation=adjust_for_inflation
+    )
 
     # Display plot
     transactions_str = ', '.join(transactions).title()
