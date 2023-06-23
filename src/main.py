@@ -29,14 +29,15 @@ def main(file_name, distributor, transactions) -> None:
     logging.info(f'Loading data from file: {source_data_path.name}...')
     earnings_report = load_earnings_report(source_data_path, distributor, partner_map_path)
 
+    print(len(earnings_report))
+    print(earnings_report.head())
+
     # TODO: separate reports into different functions
     # TODO: move the reports into a dataclass
     logging.info('Generating summary reports...')
     summary_reports = generate_reports(earnings_report, transactions, adjust_for_inflation=True)
-
-    # TODO: add transaction type(s) to plot title 
+    
     logging.info('Generating interactive graph...')
-
     transactions_str = ', '.join(transactions).title() + ' Transactions - '
     plot_1 = plotting.generate_bokeh_plot(summary_reports['rates'], title_text=f'{transactions_str} Nominal')
     plot_2 = plotting.generate_bokeh_plot(summary_reports['cpi_adjusted_rates'], title_text=f'{transactions_str} Adjusted for inflation')

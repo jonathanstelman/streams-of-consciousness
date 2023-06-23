@@ -30,7 +30,7 @@ def load_distrokid(filepath):
             filepath, 
             delimiter='\t',
             parse_dates=[0],
-            usecols=[1, 2, 6, 12]
+            usecols=[1, 2, 7, 12]
         )
         df.columns = ['Sales Date', 'Company Name Source', 'Quantity', 'Subtotal']
         
