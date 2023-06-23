@@ -42,7 +42,7 @@ transactions = st.multiselect(
     default=['Stream'])
 
 adjust_for_inflation = st.checkbox(
-    label='**Step 3:** Adjust for inflation? (Adds about 1 minute)', 
+    label='**Step 4:** Adjust for inflation? (Adds about 1 minute)', 
     value=True
 )
 
