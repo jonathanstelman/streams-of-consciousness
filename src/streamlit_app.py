@@ -52,7 +52,7 @@ def run_report():
     # Load the data
     distributor_map = {
         'CD Baby': 'cd_baby',
-        'DistroKid (n/a)': 'distro_kid'
+        'DistroKid (n/a)': 'distrokid'
     }
     distributor_code = distributor_map.get(distributor)
 

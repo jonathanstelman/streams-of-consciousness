@@ -2,7 +2,7 @@ from enum import Enum
 
 class Distributor(Enum):
     CD_BABY = 'cd_baby'
-    DISTRO_KID = 'distro_kid'
+    DISTRO_KID = 'distrokid'
 
 class Transaction(Enum):
     STREAM = 'stream'

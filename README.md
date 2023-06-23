@@ -53,7 +53,7 @@ Run with the following arguments:
 - `filename`: path to the sales file exported from your distributor's back-office
 - `distributor`: supported distributors
   - `cd_baby`
-  - `distro_kid` (not yet supported)
+  - `distrokid` (not yet supported)
 - `transactions`: the transaction types to include in your earnings summary reports
   - `stream`
   - `download`
