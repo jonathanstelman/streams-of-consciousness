@@ -74,3 +74,56 @@ def generate_bokeh_plot(
     # p.toolbar.active_inspect = [pan, wheel_zoom]
     
     return p
+
+
+
+
+def generate_echarts_graph(
+            rates: pd.DataFrame,
+            #size=(1000, 500),
+            title_text='Nominal rates (unadjusted)'
+        ):
+
+    years = [str(y) for y  in rates.columns.values] + \
+        [str(max(rates.columns.values)+1), str(max(rates.columns.values)+2)]
+    companies = [str(c) for c in rates.index.values]
+    
+    def convert_rate(value, precision=4):
+        if pd.isnull(value): return None
+        return round(value, precision)
+
+    series = []
+    for i, company in enumerate(companies):
+        values = [convert_rate(v) for v in rates.iloc[i].values]
+        series.append({
+            'name': company,
+            'type': 'line',
+            'data': values
+        })
+
+    palette = bokeh.palettes.all_palettes['Turbo'][256][32:]
+    skip = floor(len(palette) / len(companies))
+    colors = [palette[i*skip] for i in range(len(companies))]
+
+    options = {
+        "title": {"text": title_text},
+        "tooltip": {"trigger": "axis"},
+        "color": colors,
+        "legend": {
+            "orient": "vetical",
+            "right": 10, 
+            "top": "center", 
+            "data": companies,
+            #"backgroundColor": '#eee',
+        },
+        "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
+        "toolbox": {"feature": {"saveAsImage": {}}},
+        "xAxis": {
+            "type": "category",
+            "boundaryGap": False,
+            "data": years
+        },
+        "yAxis": {"type": "value"},
+        "series": series
+    }
+    return options

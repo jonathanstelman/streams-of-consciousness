@@ -1,8 +1,11 @@
 from pathlib import Path
 import streamlit as st
+from streamlit_echarts import st_echarts
+
 from data_loader import load_earnings_report
 from data_processor import generate_reports
-from plotting import generate_bokeh_plot
+#from plotting import generate_bokeh_plot
+from plotting import generate_echarts_graph
 
 
 #@st.cache_data
@@ -79,14 +82,17 @@ def run_report():
     
     if adjust_for_inflation:
         rates = summary_reports['cpi_adjusted_rates']
-        title = f'{transactions_str} Transactions - Adjusted for inflation'
+        title = f'{transactions_str} Transactions - Adjusted for Inflation'
     
     else:
         rates = summary_reports['rates']
-        title = f'{transactions_str} Transactions - Nominal rates'
+        title = f'{transactions_str} Transactions - Nominal Rates'
          
-    plot = generate_bokeh_plot(rates, title_text=title)
-    st.bokeh_chart(plot)
+    # plot = generate_bokeh_plot(rates, title_text=title)
+    # st.bokeh_chart(plot)
+
+    graph = generate_echarts_graph(rates, title_text=title)
+    st_echarts(options=graph, height="400px")
 
 
 st.button(
