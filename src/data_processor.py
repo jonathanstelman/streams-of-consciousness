@@ -1,30 +1,20 @@
 from dataclasses import dataclass, field
-from enum import Enum
 import logging
 
-from cpi import inflate
 import numpy as np
 import pandas as pd
 from pathlib import Path
 
-
-class Distributor(Enum):
-    CD_BABY = 'cd_baby'
-    DISTRO_KID = 'distro_kid'
-
-class Transaction(Enum):
-    STREAM = 'stream'
-    DOWNLOAD = 'download'
-    ROYALTY = 'royalty'
-    YOUTUBE_AUDIO = 'youtube_audio_tier'
+from data_loader import load_earnings_report
+import enums
 
 
 @dataclass
 class DistributorReport():
     
     filepath: Path
-    distributor: Distributor = Distributor.CD_BABY
-    filters: list[Transaction] = field(default_factory=[Transaction.STREAM])
+    distributor: enums.Distributor = enums.Distributor.CD_BABY
+    filters: list[enums.Transaction] = field(default_factory=[enums.Transaction.STREAM])
     source_data: pd.DataFrame = field(init=False)
 
     # Derived reports
@@ -42,41 +32,7 @@ class DistributorReport():
         self.earnings_report = reports['earnings']
         self.rate_report_cpi_adj = reports['cpi_adjusted_rates']
         self.earnings_report_cpi_adj = reports['cpi_adjusted_earnings']
-        
-        
-def load_cd_baby(filepath):
-    """Loader for a data file exported from CD Baby
-    """
-    try:
-        df = pd.read_csv(
-            filepath, 
-            delimiter='\t', 
-            parse_dates=True, 
-            usecols=[1, 2, 3, 4, 11, 12]
-        )
-        df['Transaction Type'] = df['Transaction Type'].apply(lambda s: s.replace(' ', '_').lower())
-        return df
-    
-    except Exception as e:
-        logging.error('could not read file!')
-        raise Exception('Unexpected file format!')
-    
 
-def load_earnings_report(filepath, distributor, partner_map_file):
-    """Reads earnings report and formats data
-    """
-    
-    distributor_loaders = {
-        'cd_baby': load_cd_baby
-    }
-    data = distributor_loaders.get(distributor)(filepath)
-    
-    partner_map = pd.read_csv(partner_map_file)
-    data['Year'] = pd.DatetimeIndex(data['Sales Date']).year
-    data['Month'] = pd.DatetimeIndex(data['Sales Date']).month
-    data = data.merge(partner_map, how='left')
-    data['Company Name'] = data['Company Name'].fillna('Unknown')
-    return data
 
 
 def adjust_report_for_inflation(report: pd.DataFrame, target_year: int):
@@ -88,6 +44,8 @@ def adjust_report_for_inflation(report: pd.DataFrame, target_year: int):
 
 def generate_reports(data, transactions=['stream'], adjust_for_inflation=True):
     """Aggregate all-time data by counts, earnings, and rates
+
+    TODO: separate reports into different functions
     """
     if transactions:
         tr = [t.lower() for t in transactions]
@@ -105,9 +63,8 @@ def generate_reports(data, transactions=['stream'], adjust_for_inflation=True):
     return reports
 
 
-
 def convert_rate(raw_currency_amt: float, raw_currency_year: int, convert_year: int):
-
+    from cpi import inflate
     if not raw_currency_amt:
         return np.nan
     conv_currency_amt = None

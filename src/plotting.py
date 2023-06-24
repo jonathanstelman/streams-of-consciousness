@@ -4,6 +4,10 @@ from bokeh.plotting import figure, ColumnDataSource
 from bokeh.models import Legend, NumeralTickFormatter, Title, Range1d
 import pandas as pd
 
+
+partner_details = pd.read_csv('data/partner_details.csv', index_col='Partner Name')
+
+
 def generate_bokeh_plot(
             rates: pd.DataFrame,
             size=(1000, 500),
@@ -74,3 +78,66 @@ def generate_bokeh_plot(
     # p.toolbar.active_inspect = [pan, wheel_zoom]
     
     return p
+
+
+
+
+def generate_echarts_graph(
+            rates: pd.DataFrame,
+            title_text='Nominal rates (unadjusted)'
+        ):
+
+    years = [str(y) for y  in rates.columns.values] + \
+        [str(max(rates.columns.values)+1), str(max(rates.columns.values)+2)]
+    companies = [str(c) for c in rates.index.values]
+    
+    def convert_rate(value, precision=4):
+        if pd.isnull(value): return None
+        return round(value, precision)
+
+    tiers_map = partner_details[['Tier']].squeeze()
+
+    series = []
+    for i, company in enumerate(companies):
+        values = [convert_rate(v) for v in rates.iloc[i].values]
+        series.append({
+            'name': company,
+            'type': 'line',
+            'symbol': 'circle',
+            'symbolSize': 4,
+            'data': values
+        })
+
+    #palette = bokeh.palettes.all_palettes['Turbo'][256][32:]
+    #skip = floor(len(palette) / len(companies))
+    #colors = [palette[i*skip] for i in range(len(companies))]
+
+    colors_map = partner_details[['Graph Color']].squeeze()
+    colors = [colors_map.get(company, '#DDDDDD') for company in companies]
+
+
+    options = {
+        "title": {"text": title_text},
+        "tooltip": {
+            "trigger": "axis",
+            "confine": True
+        },
+        "color": colors,
+        "emphasis": {"focus": "series"},
+        "legend": {
+            "orient": "vertical",
+            "right": 10,
+            "top": "center", 
+            "data": companies
+        },
+        "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
+        "toolbox": {"feature": {"saveAsImage": {}}},
+        "xAxis": {
+            "type": "category",
+            "boundaryGap": False,
+            "data": years
+        },
+        "yAxis": {"type": "value"},
+        "series": series
+    }
+    return options
