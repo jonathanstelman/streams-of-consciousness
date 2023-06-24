@@ -24,7 +24,7 @@ allowed_transactions = [t.value for t in enums.Transaction]
 def main(file_name, distributor, transactions) -> None:
     
     source_data_path = Path(file_name)
-    partner_map_path = Path('data/streaming_services/partner_map_simplified.csv')
+    partner_map_path = Path('data/partner_map_simplified.csv')
     
     logging.info(f'Loading data from file: {source_data_path.name}...')
     earnings_report = load_earnings_report(source_data_path, distributor, partner_map_path)

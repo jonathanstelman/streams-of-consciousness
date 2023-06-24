@@ -4,6 +4,10 @@ from bokeh.plotting import figure, ColumnDataSource
 from bokeh.models import Legend, NumeralTickFormatter, Title, Range1d
 import pandas as pd
 
+
+partner_details = pd.read_csv('data/partner_details.csv', index_col='Partner Name')
+
+
 def generate_bokeh_plot(
             rates: pd.DataFrame,
             size=(1000, 500),
@@ -80,7 +84,6 @@ def generate_bokeh_plot(
 
 def generate_echarts_graph(
             rates: pd.DataFrame,
-            #size=(1000, 500),
             title_text='Nominal rates (unadjusted)'
         ):
 
@@ -92,29 +95,40 @@ def generate_echarts_graph(
         if pd.isnull(value): return None
         return round(value, precision)
 
+    tiers_map = partner_details[['Tier']].squeeze()
+
     series = []
     for i, company in enumerate(companies):
         values = [convert_rate(v) for v in rates.iloc[i].values]
         series.append({
             'name': company,
             'type': 'line',
+            'symbol': 'circle',
+            'symbolSize': 4,
             'data': values
         })
 
-    palette = bokeh.palettes.all_palettes['Turbo'][256][32:]
-    skip = floor(len(palette) / len(companies))
-    colors = [palette[i*skip] for i in range(len(companies))]
+    #palette = bokeh.palettes.all_palettes['Turbo'][256][32:]
+    #skip = floor(len(palette) / len(companies))
+    #colors = [palette[i*skip] for i in range(len(companies))]
+
+    colors_map = partner_details[['Graph Color']].squeeze()
+    colors = [colors_map.get(company, '#DDDDDD') for company in companies]
+
 
     options = {
         "title": {"text": title_text},
-        "tooltip": {"trigger": "axis"},
+        "tooltip": {
+            "trigger": "axis",
+            "confine": True
+        },
         "color": colors,
+        "emphasis": {"focus": "series"},
         "legend": {
-            "orient": "vetical",
-            "right": 10, 
+            "orient": "vertical",
+            "right": 10,
             "top": "center", 
-            "data": companies,
-            #"backgroundColor": '#eee',
+            "data": companies
         },
         "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
         "toolbox": {"feature": {"saveAsImage": {}}},

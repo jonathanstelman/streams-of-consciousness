@@ -8,9 +8,8 @@ from data_processor import generate_reports
 from plotting import generate_echarts_graph
 
 
-#@st.cache_data
 def load_earnings_data(data_file_path, distributor):
-    partner_map_file = Path('data/streaming_services/partner_map_simplified.csv')
+    partner_map_file = Path('data/partner_map_simplified.csv')
     data = load_earnings_report(data_file_path, distributor, partner_map_file)
     return data
 
