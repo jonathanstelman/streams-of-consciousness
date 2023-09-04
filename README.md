@@ -1,5 +1,5 @@
-# Stream-of-Consciousness
-Tool for musicians to track pay-per-stream (PPS) rates for various streaming platforms over time.
+# Streams of Consciousness
+A Streamlit app that enables musicians to review pay-per-stream (PPS) rates for various streaming platforms over time.
 
 ## Mission Statement
 Streams of Consciousness is born from an idea that musicians should have more choice in how audiences pay for their products. While major streaming platforms have seen increased revenue over the last several years, musicians still earn less in take-home pay year over year. We believe that clear information about the payout rates offered by different services will enable musicians to direct their audiences to preferred streaming platforms, and provide music listeners with the ability to select the platform that best compensates the musicians they love.
