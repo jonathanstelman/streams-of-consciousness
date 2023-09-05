@@ -5,7 +5,52 @@ from streamlit_echarts import st_echarts
 from data_loader import load_earnings_report
 from data_processor import generate_reports
 #from plotting import generate_bokeh_plot
-from plotting import generate_echarts_graph
+from plotting import generate_echarts_rates_graph_options
+
+
+_sample_companies = ['Company A', 'Company B']
+_sample_data = []
+for i, company in enumerate(_sample_companies):
+    values = [1,1,1,1]
+    _sample_data.append({
+        'name': company,
+        'type': 'line',
+        'symbol': 'circle',
+        'symbolSize': 4,
+        'data': values
+    })
+_default_rate_graph_title = 'Sample Data'
+_default_graph_options = {
+    "title": {"text": _default_rate_graph_title},
+    "tooltip": {
+        "trigger": "axis",
+        "confine": True
+    },
+    "color": ['red', 'blue'], #colors,
+    "emphasis": {"focus": "series"},
+    "legend": {
+        "orient": "vertical",
+        "right": 10,
+        "top": "center", 
+        "data": _sample_companies
+    },
+    "grid": {"left": "3%", "right": "4%", "bottom": "3%", "containLabel": True},
+    "toolbox": {"feature": {"saveAsImage": {}}},
+    "xAxis": {
+        "type": "category",
+        "boundaryGap": False,
+        "data": ['2020', '2021', '2022', '2023']
+    },
+    "yAxis": {"type": "value"},
+    "series": _sample_data
+}
+
+if 'data' not in st.session_state:
+    st.session_state.data = _sample_data
+if 'rates_plot_title' not in st.session_state:
+    st.session_state.rates_plot_title = _default_rate_graph_title
+if 'rates_plot_options' not in st.session_state:
+    st.session_state.rates_plot_options = _default_graph_options
 
 
 def load_earnings_data(data_file_path, distributor):
@@ -54,12 +99,16 @@ def run_report():
     else:
         rates = summary_reports['rates']
         title = f'{transactions_str} Transactions - Nominal Rates'
+
+    
          
     # plot = generate_bokeh_plot(rates, title_text=title)
     # st.bokeh_chart(plot)
 
-    graph = generate_echarts_graph(rates, title_text=title)
-    st_echarts(options=graph, height="400px")
+    graph_options = generate_echarts_rates_graph_options(rates, title_text=title)
+
+    #st_echarts(options=graph_options, height="400px")
+    st.session_state.rates_plot_options = graph_options
     
 
 
@@ -67,7 +116,7 @@ def run_report():
 st.write("""
     # Streams of Consciousness
     Welcome to *Streams of Conciousness*!  
-    This tool allows musicians to quickly view their own stremaing
+    This app allows musicians to quickly view their own stremaing
     pay-out rates for different streaming platforms, over time.
          
     Use the sidebar to load your data and configure the graph.
@@ -102,3 +151,6 @@ with st.sidebar:
         label='Run Report!',
         on_click=run_report
     )
+
+#st.header('Streaming Rates over Time', divider='rainbow')
+st_echarts(options=st.session_state.rates_plot_options, height="400px")
