@@ -14,38 +14,6 @@ def load_earnings_data(data_file_path, distributor):
     return data
 
 
-st.write("""
-    # Streams of Consciousness
-    Welcome to *Streams of Conciousness*!  
-    This tool allows musicians to quickly view their own stremaing
-    pay-out rates for different streaming platforms, over time.
-    
-    ---
-    """
-)
-
-uploaded_file = st.file_uploader(
-    label='**Step 1:** Upload your payout data file.',
-    accept_multiple_files=False,
-    type=['.csv', '.txt', 'xlsx']
-)
-
-distributor = st.selectbox(
-    label='**Step 2:** Select your distributor.', 
-    options=['CD Baby', 'DistroKid (n/a)']
-)
-
-transactions = st.multiselect(
-    label='**Step 3:** Which transaction types should be included in the report?',
-    options=['Stream', 'Download', 'Royalty', 'YouTube Audio Tier'],
-    default=['Stream'])
-
-adjust_for_inflation = st.checkbox(
-    label='**Step 4:** Adjust for inflation? (Adds about 1 minute)', 
-    value=True
-)
-
-
 def run_report():
 
     # Load the data
@@ -92,9 +60,45 @@ def run_report():
 
     graph = generate_echarts_graph(rates, title_text=title)
     st_echarts(options=graph, height="400px")
+    
 
 
-st.button(
-    label='Run Report!',
-    on_click=run_report
+
+st.write("""
+    # Streams of Consciousness
+    Welcome to *Streams of Conciousness*!  
+    This tool allows musicians to quickly view their own stremaing
+    pay-out rates for different streaming platforms, over time.
+         
+    Use the sidebar to load your data and configure the graph.
+    
+    ---
+    """
 )
+
+with st.sidebar:
+    uploaded_file = st.file_uploader(
+        label='**Step 1:** Upload your payout data file.',
+        accept_multiple_files=False,
+        type=['.csv', '.txt', 'xlsx']
+    )
+
+    distributor = st.selectbox(
+        label='**Step 2:** Select your distributor.', 
+        options=['CD Baby', 'DistroKid (n/a)']
+    )
+
+    transactions = st.multiselect(
+        label='**Step 3:** Which transaction types should be included in the report?',
+        options=['Stream', 'Download', 'Royalty', 'YouTube Audio Tier'],
+        default=['Stream'])
+
+    adjust_for_inflation = st.checkbox(
+        label='**Step 4:** Adjust for inflation? (Adds about 1 minute)', 
+        value=False
+    )
+
+    st.button(
+        label='Run Report!',
+        on_click=run_report
+    )
