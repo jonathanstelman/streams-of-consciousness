@@ -45,12 +45,27 @@ _default_graph_options = {
     "series": _sample_data
 }
 
+# Configure session state
 if 'data' not in st.session_state:
     st.session_state.data = _sample_data
+
 if 'rates_plot_title' not in st.session_state:
     st.session_state.rates_plot_title = _default_rate_graph_title
+
 if 'rates_plot_options' not in st.session_state:
     st.session_state.rates_plot_options = _default_graph_options
+
+if 'earnings_data_file' not in st.session_state:
+    st.session_state.earnings_data_file = None
+
+
+# Processed outputs
+if 'earnings_data' not in st.session_state:
+    st.session_state.earnings_data = None
+
+if 'rates_data' not in st.session_state:
+    st.session_state.rates_data = None
+    
 
 
 def load_earnings_data(data_file_path, distributor):
@@ -66,7 +81,7 @@ def run_report():
         'CD Baby': 'cd_baby',
         'DistroKid (n/a)': 'distrokid'
     }
-    distributor_code = distributor_map.get(distributor)
+    distributor_code = distributor_map.get(st.session_state.distributor)
 
     transaction_map = {
         'Stream': 'stream',
@@ -74,40 +89,36 @@ def run_report():
         'Royalty': 'royalty',
         'YouTube Audio Tier': 'youtube_audio_tier'
     }
-    transaction_codes = [transaction_map.get(t) for t in transactions]
+    transaction_codes = [transaction_map.get(t) for t in st.session_state.transactions]
 
-    if uploaded_file is None:
-        pass
+    if st.session_state.earnings_data_file is None:
+        st.session_state.earnings_data_file = 'data/sample_data/sample_data_cd_baby.txt'
 
     # TODO: try/ catch / exception handling
-    earnings_data = load_earnings_data(uploaded_file, distributor_code)
+    earnings_data = load_earnings_data(st.session_state.earnings_data_file, distributor_code)
 
     # Generate summary report
     summary_reports = generate_reports(
         earnings_data, 
         transaction_codes, 
-        adjust_for_inflation=adjust_for_inflation
+        adjust_for_inflation=st.session_state.adjust_for_inflation
     )
 
     # Display plot
     transactions_str = ', '.join(transactions).title()
     
-    if adjust_for_inflation:
-        rates = summary_reports['cpi_adjusted_rates']
-        title = f'{transactions_str} Transactions - Adjusted for Inflation'
+    if st.session_state.adjust_for_inflation:
+        st.session_state.rates_data = summary_reports['cpi_adjusted_rates']
+        st.session_state.rates_plot_title = f'{transactions_str} Transactions - Adjusted for Inflation'
     
     else:
-        rates = summary_reports['rates']
-        title = f'{transactions_str} Transactions - Nominal Rates'
+        st.session_state.rates_data = summary_reports['rates']
+        st.session_state.rates_plot_title = f'{transactions_str} Transactions - Nominal Rates'
 
-    
-         
-    # plot = generate_bokeh_plot(rates, title_text=title)
-    # st.bokeh_chart(plot)
+    graph_options = generate_echarts_rates_graph_options(
+        st.session_state.rates_data, 
+        title_text=st.session_state.rates_plot_title)
 
-    graph_options = generate_echarts_rates_graph_options(rates, title_text=title)
-
-    #st_echarts(options=graph_options, height="400px")
     st.session_state.rates_plot_options = graph_options
     
 
@@ -126,7 +137,7 @@ st.write("""
 )
 
 with st.sidebar:
-    uploaded_file = st.file_uploader(
+    st.session_state.earnings_data_file = st.file_uploader(
         label='**Step 1:** Upload your payout data file.',
         accept_multiple_files=False,
         type=['.csv', '.txt', 'xlsx']
@@ -134,17 +145,21 @@ with st.sidebar:
 
     distributor = st.selectbox(
         label='**Step 2:** Select your distributor.', 
-        options=['CD Baby', 'DistroKid (n/a)']
+        options=['CD Baby', 'DistroKid (n/a)'],
+        key='distributor'
     )
 
     transactions = st.multiselect(
         label='**Step 3:** Which transaction types should be included in the report?',
         options=['Stream', 'Download', 'Royalty', 'YouTube Audio Tier'],
-        default=['Stream'])
+        default=['Stream'],
+        key='transactions'
+    )
 
     adjust_for_inflation = st.checkbox(
         label='**Step 4:** Adjust for inflation? (Adds about 1 minute)', 
-        value=False
+        value=False,
+        key='adjust_for_inflation'
     )
 
     st.button(
@@ -152,5 +167,4 @@ with st.sidebar:
         on_click=run_report
     )
 
-#st.header('Streaming Rates over Time', divider='rainbow')
 st_echarts(options=st.session_state.rates_plot_options, height="400px")
