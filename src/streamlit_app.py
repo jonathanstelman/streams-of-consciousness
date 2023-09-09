@@ -11,7 +11,7 @@ from plotting import generate_echarts_rates_graph_options
 _sample_companies = ['Company A', 'Company B']
 _sample_data = []
 for i, company in enumerate(_sample_companies):
-    values = [1,1,1,1]
+    values = [0.03,0.025,0.02,0.01] if i == 0 else [0.025,0.035,0.03,0.032]
     _sample_data.append({
         'name': company,
         'type': 'line',
@@ -119,7 +119,7 @@ st.write("""
     This app allows musicians to quickly view their own stremaing
     pay-out rates for different streaming platforms, over time.
          
-    Use the sidebar to load your data and configure the graph.
+    Use the sidebar on the left to load your data and configure graph options
     
     ---
     """
