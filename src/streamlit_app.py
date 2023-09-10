@@ -127,7 +127,7 @@ def run_report():
 st.write("""
     # Streams of Consciousness
     Welcome to *Streams of Conciousness*!  
-    This app allows musicians to quickly view their own stremaing
+    This app allows musicians to quickly view their own streaming
     pay-out rates for different streaming platforms, over time.
          
     Use the sidebar on the left to load your data and configure graph options

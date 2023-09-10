@@ -140,13 +140,13 @@ def run_report():
     # earnings
     st.session_state.earnings_plot_options = generate_echarts_rates_plot_options(
         summary_reports['earnings'], 
-        title_text=f'{transactions_str} Earnings - Nominal Rates'
+        title_text=f'{transactions_str} Transactions - Nominal Earnings'
     )
 
     # counts
     st.session_state.counts_plot_options = generate_echarts_rates_plot_options(
         summary_reports['counts'], 
-        title_text=f'{transactions_str} Transaction Counts'
+        title_text=f'{transactions_str} Transactions - Counts'
     )
 
     return
@@ -194,7 +194,7 @@ st.write(
     """
 # Streams of Consciousness
 Welcome to *Streams of Conciousness*!  
-This app allows musicians to quickly view their own stremaing
+This app allows musicians to quickly view their own streaming
 pay-out rates for different streaming platforms, over time.
     
 Use the sidebar on the left to load your data and configure graph options
@@ -210,10 +210,12 @@ st_echarts(
 
 st_echarts(
     options=st.session_state.earnings_plot_options,
+    height="400px",
     key='earnings_plot'
 )
 
 st_echarts(
     options=st.session_state.counts_plot_options,
+    height="400px",
     key='counts_plot'
 )
