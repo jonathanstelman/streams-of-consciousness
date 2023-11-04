@@ -129,7 +129,7 @@ def run_report():
     # rates
     st.session_state.rates_plot_options = generate_echarts_rates_plot_options(
         summary_reports['rates'], 
-        title_text=f'{transactions_str} Transactions - Nominal Rates'
+        title_text=f'{transactions_str} Transactions - Rates'
     )
 
     # rates with inflation
@@ -140,7 +140,7 @@ def run_report():
     # earnings
     st.session_state.earnings_plot_options = generate_echarts_rates_plot_options(
         summary_reports['earnings'], 
-        title_text=f'{transactions_str} Transactions - Nominal Earnings'
+        title_text=f'{transactions_str} Transactions - Earnings'
     )
 
     # counts
