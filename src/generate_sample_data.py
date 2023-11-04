@@ -35,19 +35,19 @@ countries = [
 
 
 def get_spotify_rate(year):
-    return -0.12 * (year-2000) + 3
+    return -0.03 * (year - 2000) ** (-2) + 0.01
 
 def get_amazon_rate(year):
-    return 0.013 * (year-2000) - 2
+    return 0.013 * (year - 2000) ** (-1/2) + 0.01
 
 def get_apple_rate(year):
-    return 0.03 * (year-2000) + 3
+    return -0.03 * (year - 2000) ** (1/9) + 0.042
 
 def get_youtube_rate(year):
-    return -0.4 * (year-2000) + 2
+    return 0.01 * (year - 2000) ** (-1/2) + 0.02
 
 def get_tidal_rate(year):
-    return 0.01 * (year-2000) - 1
+    return 0.01 * (year - 2000) ** (-1/2) + 0.03
 
 
 rate_function_lookup = {
