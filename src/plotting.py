@@ -81,8 +81,7 @@ def generate_bokeh_plot(
 
 
 
-
-def generate_echarts_graph(
+def generate_echarts_rates_plot_options(
             rates: pd.DataFrame,
             title_text='Nominal rates (unadjusted)'
         ):

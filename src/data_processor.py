@@ -48,15 +48,31 @@ def generate_reports(data, transactions=['stream'], adjust_for_inflation=True):
     TODO: separate reports into different functions
     """
     if transactions:
+        # filter transactions
         tr = [t.lower() for t in transactions]
         data = data[data['Transaction Type'].str.lower().isin(tr)]
     
-    reports = dict()
-    reports['counts'] = data.pivot_table(values='Quantity', index='Company Name', columns='Year', aggfunc='sum')
-    reports['earnings'] = data.pivot_table(values='Subtotal', index='Company Name', columns='Year', aggfunc='sum')
-    reports['rates'] = pd.DataFrame(reports['earnings'] / reports['counts'])
 
+    # create dataframes
+    earnings_df = data.pivot_table(values='Subtotal', index='Company Name', columns='Year', aggfunc='sum')
+    for c in earnings_df.columns:
+        earnings_df[c] = earnings_df[c].astype(float)
+    
+    counts_df = data.pivot_table(values='Quantity', index='Company Name', columns='Year', aggfunc='sum')
+    for c in counts_df.columns:
+        counts_df[c] = counts_df[c].astype(float)
+
+    rates_df = earnings_df / counts_df
+
+    # structure reports in a dictionary
+    reports = dict()
+    reports['counts'] = counts_df
+    reports['earnings'] = earnings_df
+    reports['rates'] = rates_df
+
+    # append inflation-adjusted reports
     if adjust_for_inflation:
+        # hardcode inflation year to 2022 because cpi library doesn't have more recent data
         reports['cpi_adjusted_rates'] = adjust_report_for_inflation(reports['rates'], 2022)
         reports['cpi_adjusted_earnings'] = adjust_report_for_inflation(reports['earnings'], 2022)
 
