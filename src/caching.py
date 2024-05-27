@@ -29,12 +29,12 @@ def disk_cache(func):
     def wrapper(*args, **kwargs):
         cache_key = f"{func.__name__}_{args}_{kwargs}"
         if cache_key in cache:
-            logger.info('Retrieved results from cache')
+            logger.debug('Retrieved results from cache')
             return cache[cache_key]
 
         result = func(*args, **kwargs)
         cache[cache_key] = result
-        logger.info('Caching result to %s', cache_key)
+        logger.debug('Caching result to %s', cache_key)
         save_cache(cache)
 
         return result
