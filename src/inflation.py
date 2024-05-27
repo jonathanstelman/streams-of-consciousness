@@ -4,6 +4,7 @@ import os
 import requests
 
 from dotenv import load_dotenv
+import numpy as np
 
 from caching import disk_cache
 from logger import logger
@@ -105,8 +106,8 @@ def get_most_recent_cpi(cpi_data: dict, year: int, month: int) -> float:
 
     tries = 0
     recent_cpi = None
-    while not recent_cpi and tries < 3:
-        logger.info('Looking up CPI for date: %s', f'{year}-{month}')
+    while not recent_cpi and tries < 6:
+        logger.debug('Looking up CPI for date: %s', f'{year}-{month}')
         try:
             recent_cpi = cpi_data[year][month]
         except KeyError:
@@ -133,4 +134,7 @@ def adjust_amount(
     """
     from_cpi = get_most_recent_cpi(cpi_data, from_date.year, from_date.month)
     to_cpi = get_most_recent_cpi(cpi_data, to_date.year, to_date.month)
+
+    if not (from_cpi and to_cpi): # TODO: raise an exception here instead
+        return np.nan
     return amount * (to_cpi / from_cpi)
