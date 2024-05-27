@@ -104,7 +104,7 @@ available_transactions = {
 
 
 def run_report():
-    """Run report"""
+    """Run report generator"""
 
     transaction_map = {
         'Stream': 'stream',
@@ -121,34 +121,39 @@ def run_report():
 
     # Generate summary report
     summary_reports = generate_reports(
-        st.session_state.earnings_data, 
-        transaction_codes, 
+        st.session_state.earnings_data,
+        transaction_codes,
         adjust_for_inflation=st.session_state.adjust_for_inflation
     )
 
     # Display plot
     transactions_str = ', '.join(st.session_state.transactions).title()
 
+
+    if st.session_state.adjust_for_inflation:
+        inflation_str = ' - Adjusted for Inflation'
+        st.session_state.rates_data = summary_reports['cpi_adjusted_rates']
+        st.session_state.earnings_data = summary_reports['cpi_adjusted_earnings']
+    else:
+        inflation_str = ''
+        st.session_state.rates_data = summary_reports['rates']
+        st.session_state.earnings_data = summary_reports['earnings']
+
     # rates
     st.session_state.rates_plot_options = generate_echarts_rates_plot_options(
-        summary_reports['rates'], 
-        title_text=f'{transactions_str} Transactions - Rates'
+        st.session_state.rates_data,
+        title_text=f'{transactions_str} Transactions - Rates{inflation_str}'
     )
-
-    # rates with inflation
-    # if st.session_state.adjust_for_inflation:
-    #     st.session_state.rates_data = summary_reports['cpi_adjusted_rates']
-    #     st.session_state.rates_plot_title = f'{transactions_str} Transactions - Adjusted for Inflation'
 
     # earnings
     st.session_state.earnings_plot_options = generate_echarts_rates_plot_options(
-        summary_reports['earnings'], 
-        title_text=f'{transactions_str} Transactions - Earnings'
+        st.session_state.earnings_data,
+        title_text=f'{transactions_str} Transactions - Earnings{inflation_str}'
     )
 
     # counts
     st.session_state.counts_plot_options = generate_echarts_rates_plot_options(
-        summary_reports['counts'], 
+        summary_reports['counts'],
         title_text=f'{transactions_str} Transactions - Counts'
     )
 
@@ -157,66 +162,79 @@ def run_report():
 
 # Page Layout
 
-with st.sidebar:
+def display_sidebar():
+    """Display the sidebar"""
+    with st.sidebar:
 
-    distributor = st.selectbox(
-        label='**Step 1:** Select your distributor.', 
-        options=['CD Baby'], # TODO: add 'DistroKid'
-        key='distributor'
-    )
+        distributor = st.selectbox(
+            label='**Step 1:** Select your distributor.', 
+            options=['CD Baby'], # TODO: add 'DistroKid'
+            key='distributor'
+        )
 
-    earnings_data_file = st.session_state.earnings_data_file = st.file_uploader(
-        label='**Step 2:** Upload your payout data file.',
-        accept_multiple_files=False,
-        type=['.csv', '.txt', 'xlsx']
-    )
-    load_earnings_data()
+        earnings_data_file = st.session_state.earnings_data_file = st.file_uploader(
+            label='**Step 2:** Upload your payout data file.',
+            accept_multiple_files=False,
+            type=['.csv', '.txt', 'xlsx']
+        )
+        load_earnings_data()
 
-    transactions = st.multiselect(
-        label='**Step 3:** Which transaction types should be included in the report?',
-        options=available_transactions.get(distributor),
-        key='transactions'
-    )
+        transactions = st.multiselect(
+            label='**Step 3:** Which transaction types should be included in the report?',
+            options=available_transactions.get(distributor),
+            key='transactions'
+        )
 
-    adjust_for_inflation = st.checkbox(
-        label='**Step 4:** Adjust for inflation? (Adds about 1 minute)', 
-        value=False,
-        key='adjust_for_inflation'
-    )
+        adjust_for_inflation = st.checkbox(
+            label='**Step 4:** Adjust for inflation? ',
+            value=False,
+            key='adjust_for_inflation'
+        )
 
-    run_report_button = st.button(
-        label='Run Report!',
-        on_click=run_report
-    )
+        run_report_button = st.button(
+            label='Run Report!',
+            on_click=run_report
+        )
+
+    return
 
 
+def display_page() -> None:
+    """Display the main page"""
+    st.markdown("""
+    # Streams of Consciousness
+    Welcome to *Streams of Conciousness*!  
+    This app allows musicians to quickly view their own streaming
+    pay-out rates for different streaming platforms, over time.
+        
+    Use the left sidebar to load your data and configure graph options.
 
-st.write(
+    ---
     """
-# Streams of Consciousness
-Welcome to *Streams of Conciousness*!  
-This app allows musicians to quickly view their own streaming
-pay-out rates for different streaming platforms, over time.
-    
-Use the sidebar on the left to load your data and configure graph options
+    )
+    st_echarts(
+        options=st.session_state.rates_plot_options,
+        height="400px",
+        key='rates_plot'
+    )
+    st_echarts(
+        options=st.session_state.earnings_plot_options,
+        height="400px",
+        key='earnings_plot'
+    )
+    st_echarts(
+        options=st.session_state.counts_plot_options,
+        height="400px",
+        key='counts_plot'
+    )
+    return
 
----
-"""
-)
-st_echarts(
-    options=st.session_state.rates_plot_options, 
-    height="400px",
-    key='rates_plot'
-)
 
-st_echarts(
-    options=st.session_state.earnings_plot_options,
-    height="400px",
-    key='earnings_plot'
-)
+def main():
+    """Render Streamlit App"""
+    display_sidebar()
+    display_page()
 
-st_echarts(
-    options=st.session_state.counts_plot_options,
-    height="400px",
-    key='counts_plot'
-)
+
+if __name__ == "__main__":
+    main()

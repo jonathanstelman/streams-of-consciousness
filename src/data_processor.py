@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -6,6 +7,8 @@ import pandas as pd
 from data_loader import load_earnings_report
 import enums
 from inflation import adjust_amount, get_cpi_data
+from logger import logger
+from utils import to_date
 
 
 @dataclass
@@ -38,17 +41,19 @@ class DistributorReport():
         self.earnings_report_cpi_adj = reports['cpi_adjusted_earnings']
 
 
-
-def adjust_report_for_inflation(report: pd.DataFrame, target_year: int):
+def adjust_report_for_inflation(report: pd.DataFrame, target_date: date):
     """
     Iterate over all columns (years) and adjusts the amount to the target year value
     """
     df = report.copy()
     years = report.columns
-    cpi_data = get_cpi_data(years.min(), years.max())
+    cpi_data = get_cpi_data(years.min(), date.today().year)
     for year in years:
+        from_date = to_date(f'{year}-06-30')
         df[year] = df[year].apply(
-            lambda amt: adjust_amount(cpi_data, amt, int(year), target_year)
+            lambda amt:
+                amt if pd.isnull(amt)
+                else adjust_amount(cpi_data, amt, from_date, target_date)
         )
     return df
 
@@ -92,8 +97,8 @@ def generate_reports(data, transactions=('stream'), adjust_for_inflation=True):
 
     # append inflation-adjusted reports
     if adjust_for_inflation:
-        # hardcode inflation year to 2022 because cpi library doesn't have more recent data
-        reports['cpi_adjusted_rates'] = adjust_report_for_inflation(reports['rates'], 2022)
-        reports['cpi_adjusted_earnings'] = adjust_report_for_inflation(reports['earnings'], 2022)
+        logger.debug('Adding CPI adjusted reports')
+        reports['cpi_adjusted_rates'] = adjust_report_for_inflation(reports['rates'], date.today())
+        reports['cpi_adjusted_earnings'] = adjust_report_for_inflation(reports['earnings'], date.today())
 
     return reports
