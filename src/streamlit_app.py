@@ -19,9 +19,9 @@ for i, company in enumerate(_sample_companies):
         'symbolSize': 4,
         'data': values
     })
-_default_rate_graph_title = 'Sample Data'
-_default_graph_options = {
-    "title": {"text": _default_rate_graph_title},
+DEFAULT_RATE_GRAPH_TITLE = 'Sample Data'
+DEFUALT_GRAPH_OPTIONS = {
+    "title": {"text": DEFAULT_RATE_GRAPH_TITLE},
     "tooltip": {
         "trigger": "axis",
         "confine": True
@@ -50,10 +50,10 @@ if 'data' not in st.session_state:
     st.session_state.data = _sample_data
 
 if 'rates_plot_title' not in st.session_state:
-    st.session_state.rates_plot_title = _default_rate_graph_title
+    st.session_state.rates_plot_title = DEFAULT_RATE_GRAPH_TITLE
 
 if 'rates_plot_options' not in st.session_state:
-    st.session_state.rates_plot_options = _default_graph_options
+    st.session_state.rates_plot_options = DEFUALT_GRAPH_OPTIONS
 
 if 'earnings_data_file' not in st.session_state:
     st.session_state.earnings_data_file = None
@@ -65,10 +65,11 @@ if 'earnings_data' not in st.session_state:
 
 if 'rates_data' not in st.session_state:
     st.session_state.rates_data = None
-    
+
 
 
 def load_earnings_data(data_file_path, distributor):
+    """Load the earnings report for a specified distributor"""
     partner_map_file = Path('data/partner_map_simplified.csv')
     data = load_earnings_report(data_file_path, distributor, partner_map_file)
     return data
@@ -99,18 +100,18 @@ def run_report():
 
     # Generate summary report
     summary_reports = generate_reports(
-        earnings_data, 
-        transaction_codes, 
+        earnings_data,
+        transaction_codes,
         adjust_for_inflation=st.session_state.adjust_for_inflation
     )
 
     # Display plot
     transactions_str = ', '.join(transactions).title()
-    
+
     if st.session_state.adjust_for_inflation:
         st.session_state.rates_data = summary_reports['cpi_adjusted_rates']
         st.session_state.rates_plot_title = f'{transactions_str} Transactions - Adjusted for Inflation'
-    
+
     else:
         st.session_state.rates_data = summary_reports['rates']
         st.session_state.rates_plot_title = f'{transactions_str} Transactions - Nominal Rates'
@@ -120,7 +121,6 @@ def run_report():
         title_text=st.session_state.rates_plot_title)
 
     st.session_state.rates_plot_options = graph_options
-    
 
 
 
