@@ -6,6 +6,8 @@ from data_loader import load_earnings_report
 from data_processor import generate_reports
 from plotting import generate_echarts_rates_plot_options
 
+st.set_page_config(layout="wide")
+
 
 _sample_companies = ['Company A', 'Company B']
 _sample_data = []
@@ -217,11 +219,13 @@ def display_page() -> None:
         height="400px",
         key='rates_plot'
     )
+
     st_echarts(
         options=st.session_state.earnings_plot_options,
         height="400px",
         key='earnings_plot'
     )
+
     st_echarts(
         options=st.session_state.counts_plot_options,
         height="400px",
