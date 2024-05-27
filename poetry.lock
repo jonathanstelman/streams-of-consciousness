@@ -332,23 +332,6 @@ traitlets = ">=4"
 test = ["pytest"]
 
 [[package]]
-name = "cpi"
-version = "1.1.5"
-description = "Quickly adjust U.S. dollars for inflation using the Consumer Price Index (CPI)"
-optional = false
-python-versions = "*"
-files = [
-    {file = "cpi-1.1.5-py2.py3-none-any.whl", hash = "sha256:4d82d29f76409f4ca8c93655dd454deac35a0b0ff4f5dcbc4603c34604c3f0aa"},
-    {file = "cpi-1.1.5.tar.gz", hash = "sha256:f8c7589ce58dbc4319319728a0ec28cc8cd01565a222f3d304ab6cd3117dc8a3"},
-]
-
-[package.dependencies]
-click = "*"
-pandas = "*"
-python-dateutil = "*"
-requests = "*"
-
-[[package]]
 name = "debugpy"
 version = "1.8.1"
 description = "An implementation of the Debug Adapter Protocol for Python"
@@ -1286,6 +1269,20 @@ files = [
 six = ">=1.5"
 
 [[package]]
+name = "python-dotenv"
+version = "1.0.1"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "python-dotenv-1.0.1.tar.gz", hash = "sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca"},
+    {file = "python_dotenv-1.0.1-py3-none-any.whl", hash = "sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
+[[package]]
 name = "pytz"
 version = "2024.1"
 description = "World timezone definitions, modern and historical"
@@ -2019,4 +2016,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">3.9.7,<3.13"
-content-hash = "3e6a28eebb38e7943a326847f778304c90393c9d9e5786b6ec2456f9263058d5"
+content-hash = "2a8f4c46dd4ca112237062810359e98dd582a5c73f1673ebe12c18dccdb8bb64"
