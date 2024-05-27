@@ -4,8 +4,7 @@ from streamlit_echarts import st_echarts
 
 from data_loader import load_earnings_report
 from data_processor import generate_reports
-#from plotting import generate_bokeh_plot
-from plotting import generate_echarts_rates_graph_options
+from plotting import generate_echarts_rates_plot_options
 
 
 _sample_companies = ['Company A', 'Company B']
@@ -76,6 +75,7 @@ def load_earnings_data(data_file_path, distributor):
 
 
 def run_report():
+    """Generate a report"""
 
     # Load the data
     distributor_map = {
@@ -116,9 +116,10 @@ def run_report():
         st.session_state.rates_data = summary_reports['rates']
         st.session_state.rates_plot_title = f'{transactions_str} Transactions - Nominal Rates'
 
-    graph_options = generate_echarts_rates_graph_options(
-        st.session_state.rates_data, 
-        title_text=st.session_state.rates_plot_title)
+    graph_options = generate_echarts_rates_plot_options(
+        st.session_state.rates_data,
+        title_text=st.session_state.rates_plot_title
+    )
 
     st.session_state.rates_plot_options = graph_options
 

@@ -18,9 +18,9 @@ for i, company in enumerate(_sample_companies):
         'symbolSize': 4,
         'data': values
     })
-_default_rate_graph_title = 'Sample Data'
-_default_graph_options = {
-    "title": {"text": _default_rate_graph_title},
+DEFAULT_RATE_PLOT_TITLE = 'Sample Data'
+DEFAULT_PLOT_OPTIONS = {
+    "title": {"text": DEFAULT_RATE_PLOT_TITLE},
     "tooltip": {
         "trigger": "axis",
         "confine": True
@@ -49,10 +49,10 @@ if 'data' not in st.session_state:
     st.session_state.data = _sample_data
 
 if 'rates_plot_title' not in st.session_state:
-    st.session_state.rates_plot_title = _default_rate_graph_title
+    st.session_state.rates_plot_title = DEFAULT_RATE_PLOT_TITLE
 
 if 'rates_plot_options' not in st.session_state:
-    st.session_state.rates_plot_options = _default_graph_options
+    st.session_state.rates_plot_options = DEFAULT_PLOT_OPTIONS
 
 if 'earnings_plot_options' not in st.session_state:
     st.session_state.earnings_plot_options = None
@@ -77,9 +77,10 @@ if 'earnings_data' not in st.session_state:
 
 if 'rates_data' not in st.session_state:
     st.session_state.rates_data = None
-     
+
 
 def load_earnings_data() -> None:
+    """Load earnings data"""
     distributor_map = {
         'CD Baby': 'cd_baby', # TODO: add 'DistroKid': 'distrokid'
     }
@@ -94,14 +95,16 @@ def load_earnings_data() -> None:
     st.session_state.earnings_data = load_earnings_report(
         _file, distributor_code, partner_map_file
     )
-    
+
 
 available_transactions = {
-    'CD Baby': ['Stream', 'Download', 'Royalty', 'YouTube Audio Tier'], # TODO: 'DistroKid': ['Stream', 'Download']
+    'CD Baby': ['Stream', 'Download', 'Royalty', 'YouTube Audio Tier'],
+    # TODO: 'DistroKid': ['Stream', 'Download']
 }
 
 
 def run_report():
+    """Run report"""
 
     transaction_map = {
         'Stream': 'stream',
@@ -125,7 +128,7 @@ def run_report():
 
     # Display plot
     transactions_str = ', '.join(st.session_state.transactions).title()
-    
+
     # rates
     st.session_state.rates_plot_options = generate_echarts_rates_plot_options(
         summary_reports['rates'], 
@@ -136,7 +139,7 @@ def run_report():
     # if st.session_state.adjust_for_inflation:
     #     st.session_state.rates_data = summary_reports['cpi_adjusted_rates']
     #     st.session_state.rates_plot_title = f'{transactions_str} Transactions - Adjusted for Inflation'
-    
+
     # earnings
     st.session_state.earnings_plot_options = generate_echarts_rates_plot_options(
         summary_reports['earnings'], 
@@ -150,8 +153,6 @@ def run_report():
     )
 
     return
-    
-    
 
 
 # Page Layout
@@ -182,7 +183,7 @@ with st.sidebar:
         value=False,
         key='adjust_for_inflation'
     )
-    
+
     run_report_button = st.button(
         label='Run Report!',
         on_click=run_report
