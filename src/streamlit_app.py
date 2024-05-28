@@ -5,6 +5,7 @@ from streamlit_echarts import st_echarts
 from data_loader import load_earnings_report
 from data_processor import generate_reports
 from plotting import generate_echarts_rates_plot_options
+from utils import convert_df_to_csv
 
 st.set_page_config(layout="wide")
 
@@ -154,8 +155,9 @@ def run_report():
     )
 
     # counts
+    st.session_state.counts_data = summary_reports['counts']
     st.session_state.counts_plot_options = generate_echarts_rates_plot_options(
-        summary_reports['counts'],
+        st.session_state.counts_data,
         title_text=f'{transactions_str} Transactions - Counts'
     )
 
@@ -219,18 +221,42 @@ def display_page() -> None:
         height="400px",
         key='rates_plot'
     )
+    if 'rates_data' in st.session_state and st.session_state.rates_data is not None:
+        rates_csv = convert_df_to_csv(st.session_state.rates_data)
+        st.download_button(
+            label="Download CSV",
+            data=rates_csv,
+            file_name='soc_streaming_rates.csv',
+            mime='text/csv',
+        )
 
     st_echarts(
         options=st.session_state.earnings_plot_options,
         height="400px",
         key='earnings_plot'
     )
+    if 'earnings_data' in st.session_state and st.session_state.earnings_data is not None:
+        earnings_csv = convert_df_to_csv(st.session_state.earnings_data)
+        st.download_button(
+            label="Download CSV",
+            data=earnings_csv,
+            file_name='soc_streaming_earnings.csv',
+            mime='text/csv',
+        )
 
     st_echarts(
         options=st.session_state.counts_plot_options,
         height="400px",
         key='counts_plot'
     )
+    if 'counts_data' in st.session_state and st.session_state.counts_data is not None:
+        counts_csv = convert_df_to_csv(st.session_state.counts_data)
+        st.download_button(
+            label="Download CSV",
+            data=counts_csv,
+            file_name='soc_streaming_counts.csv',
+            mime='text/csv',
+        )
     return
 
 
