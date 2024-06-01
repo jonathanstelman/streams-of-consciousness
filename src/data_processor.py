@@ -8,7 +8,7 @@ from data_loader import load_earnings_report
 import enums
 from inflation import adjust_amount, get_cpi_data
 from logger import logger
-from utils import to_date
+from utils import normalize_dataframe_values, to_date
 
 
 @dataclass
@@ -28,7 +28,12 @@ class DistributorReport():
     earnings_report_cpi_adj: pd.DataFrame = field(init=False)
 
     def __post_init__(self):
-        self.source_data = load_earnings_report(self.filepath, self.distributor)
+        service_map_file = Path('data/partner_map_simplified.csv')
+        self.source_data = load_earnings_report(
+            self.filepath,
+            self.distributor,
+            service_map_file=service_map_file
+        )
         reports = generate_reports(
             self.source_data,
             transactions=self.filters,
@@ -69,36 +74,40 @@ def generate_reports(data, transactions=('stream'), adjust_for_inflation=True):
         data = data[data['Transaction Type'].str.lower().isin(tr)]
 
     # create dataframes
-    earnings_df = data.pivot_table(
+    earnings = data.pivot_table(
         values='Subtotal',
         index='Company Name',
         columns='Year',
         aggfunc='sum'
     )
-    for c in earnings_df.columns:
-        earnings_df[c] = earnings_df[c].astype(float)
+    earnings = normalize_dataframe_values(earnings)
 
-    counts_df = data.pivot_table(
+    counts = data.pivot_table(
         values='Quantity',
         index='Company Name',
         columns='Year',
         aggfunc='sum'
     )
-    for c in counts_df.columns:
-        counts_df[c] = counts_df[c].astype(float)
+    counts = normalize_dataframe_values(counts)
 
-    rates_df = earnings_df / counts_df
+    rates = earnings / counts
+    rates = normalize_dataframe_values(rates)
 
     # structure reports in a dictionary
     reports = dict()
-    reports['counts'] = counts_df
-    reports['earnings'] = earnings_df
-    reports['rates'] = rates_df
+    reports['counts'] = counts
+    reports['earnings'] = earnings
+    reports['rates'] = rates
 
     # append inflation-adjusted reports
     if adjust_for_inflation:
-        logger.debug('Adding CPI adjusted reports')
-        reports['cpi_adjusted_rates'] = adjust_report_for_inflation(reports['rates'], date.today())
-        reports['cpi_adjusted_earnings'] = adjust_report_for_inflation(reports['earnings'], date.today())
+        logger.info('Adding CPI adjusted reports')
+        rates_adjusted = adjust_report_for_inflation(reports['rates'], date.today())
+        rates_adjusted = normalize_dataframe_values(rates_adjusted)
+        reports['cpi_adjusted_rates'] = rates_adjusted
+
+        earnings_adjusted = adjust_report_for_inflation(reports['earnings'], date.today())
+        earnings_adjusted = normalize_dataframe_values(earnings_adjusted)
+        reports['cpi_adjusted_earnings'] = earnings_adjusted
 
     return reports
