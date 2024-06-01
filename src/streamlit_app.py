@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 import streamlit as st
 from streamlit_echarts import st_echarts
@@ -70,6 +71,9 @@ if 'distributor' not in st.session_state:
 if 'earnings_data_file' not in st.session_state:
     st.session_state.earnings_data_file = None
 
+if 'raw_earnings_data' not in st.session_state:
+    st.session_state.raw_earnings_data = None
+
 if 'transactions' not in st.session_state:
     st.session_state.transactions = ['Stream']
 
@@ -81,6 +85,9 @@ if 'earnings_data' not in st.session_state:
 if 'rates_data' not in st.session_state:
     st.session_state.rates_data = None
 
+if 'counts_data' not in st.session_state:
+    st.session_state.counts_data = None
+
 
 def load_earnings_data() -> None:
     """Load earnings data"""
@@ -88,15 +95,15 @@ def load_earnings_data() -> None:
         'CD Baby': 'cd_baby', # TODO: add 'DistroKid': 'distrokid'
     }
     distributor_code = distributor_map.get(st.session_state.distributor)
-    partner_map_file = Path('data/partner_map_simplified.csv')
+    service_map_file = Path('data/partner_map_simplified.csv')
 
     if st.session_state.earnings_data_file:
         _file = st.session_state.earnings_data_file
     else:
         _file = 'data/sample_data/sample_data_cd_baby.txt'
 
-    st.session_state.earnings_data = load_earnings_report(
-        _file, distributor_code, partner_map_file
+    st.session_state.raw_earnings_data = load_earnings_report(
+        _file, distributor_code, service_map_file
     )
 
 
@@ -124,14 +131,13 @@ def run_report():
 
     # Generate summary report
     summary_reports = generate_reports(
-        st.session_state.earnings_data,
+        st.session_state.raw_earnings_data,
         transaction_codes,
         adjust_for_inflation=st.session_state.adjust_for_inflation
     )
 
     # Display plot
     transactions_str = ', '.join(st.session_state.transactions).title()
-
 
     if st.session_state.adjust_for_inflation:
         inflation_str = ' - Adjusted for Inflation'
@@ -216,6 +222,10 @@ def display_page() -> None:
     ---
     """
     )
+    # Downloader filename
+    adjusted = '_adjusted' if st.session_state.adjust_for_inflation else ''
+    timestamp = datetime.now().strftime("%Y%m%d")
+
     st_echarts(
         options=st.session_state.rates_plot_options,
         height="400px",
@@ -226,7 +236,7 @@ def display_page() -> None:
         st.download_button(
             label="Download CSV",
             data=rates_csv,
-            file_name='soc_streaming_rates.csv',
+            file_name=f'soc_streaming_rates{adjusted}_{timestamp}.csv',
             mime='text/csv',
         )
 
@@ -240,7 +250,7 @@ def display_page() -> None:
         st.download_button(
             label="Download CSV",
             data=earnings_csv,
-            file_name='soc_streaming_earnings.csv',
+            file_name=f'soc_streaming_earnings{adjusted}_{timestamp}.csv',
             mime='text/csv',
         )
 
@@ -254,7 +264,7 @@ def display_page() -> None:
         st.download_button(
             label="Download CSV",
             data=counts_csv,
-            file_name='soc_streaming_counts.csv',
+            file_name=f'soc_streaming_counts_{timestamp}.csv',
             mime='text/csv',
         )
     return
