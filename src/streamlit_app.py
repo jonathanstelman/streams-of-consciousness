@@ -88,7 +88,7 @@ def load_earnings_data() -> None:
         'CD Baby': 'cd_baby', # TODO: add 'DistroKid': 'distrokid'
     }
     distributor_code = distributor_map.get(st.session_state.distributor)
-    partner_map_file = Path('data/partner_map_simplified.csv')
+    service_map_file = Path('data/partner_map_simplified.csv')
 
     if st.session_state.earnings_data_file:
         _file = st.session_state.earnings_data_file
@@ -96,7 +96,7 @@ def load_earnings_data() -> None:
         _file = 'data/sample_data/sample_data_cd_baby.txt'
 
     st.session_state.earnings_data = load_earnings_report(
-        _file, distributor_code, partner_map_file
+        _file, distributor_code, service_map_file
     )
 
 
