@@ -1,4 +1,5 @@
 import pandas as pd
+from logger import logger
 
 
 def load_cd_baby(filepath):
@@ -21,11 +22,11 @@ def load_cd_baby(filepath):
     return df
 
 
-def load_distrokid(filepath): 
+def load_distrokid(filepath) -> pd.DataFrame:
     """Loader for a data file exported from DistroKid
     """
     df = pd.read_csv(
-        filepath, 
+        filepath,
         delimiter='\t',
         parse_dates=[0],
         usecols=[1, 2, 7, 12]
@@ -41,7 +42,7 @@ def load_distrokid(filepath):
 
 
 
-def load_earnings_report(filepath, distributor, service_map_file):
+def load_earnings_report(filepath, distributor, service_map_file) -> pd.DataFrame:
     """Reads earnings report and transforms data, formatting dates,
     and joining streaming company names to use
     """
@@ -50,8 +51,11 @@ def load_earnings_report(filepath, distributor, service_map_file):
         'cd_baby': load_cd_baby,
         'distrokid': load_distrokid
     }
+
+    logger.info('Loading data using distibutor "%s"', distributor)
     data = distributor_loaders.get(distributor)(filepath)
 
+    logger.info('Using service map file: "%s"', service_map_file)
     service_map = pd.read_csv(service_map_file)
     data['Year'] = pd.DatetimeIndex(data['Sales Date']).year
     data['Month'] = pd.DatetimeIndex(data['Sales Date']).month
